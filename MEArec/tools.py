@@ -336,6 +336,18 @@ def load_recordings(recordings, return_h5_objects=True,
 
     rec_dict = {}
     recordings = Path(recordings)
+
+    if recordings.is_dir():
+        recording_files = [f for f in recordings.rglob("*") if
+                          f.name.endswith(('.h5', '.hdf5'))]
+        recording_files.sort(reverse=True)
+        if len(recording_files) == 0:
+            raise AttributeError(recordings, ' contains no cell models!')
+        else:
+            recordings = recording_files[0]
+            if verbose:
+                print(f'Loading file {recordings}')
+
     if (recordings.suffix in ['.h5', '.hdf5']) or (not check_suffix):
         f = h5py.File(str(recordings), 'r')
         mearec_version = f.attrs.get('mearec_version', '1.4.0')
