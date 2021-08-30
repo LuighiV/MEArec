@@ -263,6 +263,18 @@ def load_templates(templates, return_h5_objects=True, verbose=False, check_suffi
 
     temp_dict = {}
     templates = Path(templates)
+
+    if templates.is_dir():
+        template_files = [f for f in templates.rglob("*") if
+                          f.name.endswith(('.h5', '.hdf5'))]
+        template_files.sort(reverse=True)
+        if len(template_files) == 0:
+            raise AttributeError(templates, ' contains no cell models!')
+        else:
+            templates = template_files[0]
+            if verbose:
+                print(f'Loading file {templates}')
+
     if (templates.suffix in ['.h5', '.hdf5']) or (not check_suffix):
         f = h5py.File(str(templates), 'r')
         info = load_dict_from_hdf5(f, 'info/')
